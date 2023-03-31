@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (t.total <= 0) clearInterval(timeInterval);
     }
   }
+
   setClock('.timer', deadline);
 
   function closeModalWindow() {
@@ -88,12 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
     modalWindow.classList.remove('show');
     document.body.style.overflow = '';
   }
+
   function showModalWindow() {
     modalWindow.classList.add('show');
     modalWindow.classList.remove('hide');
     document.body.style.overflow = 'hidden';
     clearTimeout(modalTimerId);
   }
+
   const modalTimerId = setTimeout(showModalWindow, 50000);
 
   btnModal.forEach(el => {
@@ -116,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeModalWindow();
     }
   });
+
   function scrollModalListener() {
     if (
       window.pageYOffset + document.documentElement.clientHeight >=
@@ -125,20 +129,22 @@ document.addEventListener('DOMContentLoaded', () => {
       window.removeEventListener('scroll', scrollModalListener);
     }
   }
+
   window.addEventListener('scroll', scrollModalListener);
 
   class MenuCard {
-    constructor(src, alt, title, desrc, price, parentSelector, ...clases) {
-      this.src = src;
-      this.alt = alt;
+    constructor(img, altimg, title, descr, price, parentSelector, ...clases) {
+      this.img = img;
+      this.altimg = altimg;
       this.title = title;
-      this.desrc = desrc;
+      this.descr = descr;
       this.price = price;
       this.transfer = 80;
       this.classes = clases;
       this.parent = document.querySelector(parentSelector);
       this.changeToRUB();
     }
+
     changeToRUB() {
       this.price *= this.transfer;
     }
@@ -150,9 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       this.classes.forEach(className => element.classList.add(className));
       element.innerHTML = `
-          <img src="${this.src}" alt="${this.alt}">
+          <img src="${this.img}" alt="${this.altimg}">
           <h3 class="menu__item-subtitle">${this.title}</h3>
-          <div class="menu__item-descr">${this.desrc}</div>
+          <div class="menu__item-descr">${this.descr}</div>
           <div class="menu__item-divider"></div>
           <div class="menu__item-price">
               <div class="menu__item-cost">Цена:</div>
@@ -163,38 +169,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const fitnessCard = new MenuCard(
-    'img/tabs/vegy.jpg',
-    'vegy',
-    'Меню "Фитнес"',
-    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-    5,
-    '.menu .container',
-    'menu__item'
-  );
+  const getData = async url => {
+    const res = await fetch(url);
+    if (!res.ok)
+      throw new Error(`Could not fetch ${url}, status: ${res.status}`);
 
-  const premiumCard = new MenuCard(
-    'img/tabs/elite.jpg',
-    'elite',
-    'Меню “Премиум”',
-    'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-    9,
-    '.menu .container',
-    'menu__item'
-  );
+    return await res.json();
+  };
 
-  const postCard = new MenuCard(
-    'img/tabs/post.jpg',
-    'post',
-    'Меню "Постное"',
-    'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-    6,
-    '.menu .container',
-    'menu__item'
-  );
-  const cardArr = [fitnessCard, premiumCard, postCard];
-  cardArr.forEach(e => {
-    e.render();
+  getData('http://localhost:3000/menu').then(data => {
+    data.forEach(({ img, altimg, title, descr, price }) => {
+      new MenuCard(
+        img,
+        altimg,
+        title,
+        descr,
+        price,
+        '.menu .container',
+        'menu__item'
+      ).render();
+    });
   });
 
   const message = {
@@ -204,10 +198,21 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   forms.forEach(form => {
-    postData(form);
+    bindPostData(form);
   });
 
-  function postData(form) {
+  const postData = async (url, data) => {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: data,
+    });
+    return await res.json();
+  };
+
+  function bindPostData(form) {
     form.addEventListener('submit', ev => {
       ev.preventDefault();
       const statusMessage = document.createElement('img');
@@ -220,22 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(form);
 
-      const object = {};
-      formData.forEach((value, key) => {
-        object[key] = value;
-      });
+      const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-      fetch('server1.php', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(object),
-      })
-        .then(res => {
-          if (!res.ok) throw new Error();
-          return res.text();
-        })
+      postData('http://localhost:3000/requests', json)
         .then(data => {
           console.log(data);
           showThanksModal(message.success);
@@ -249,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
   }
+
   function showThanksModal(message) {
     prevModalDialog.classList.add('hide');
     showModalWindow();
@@ -268,4 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
       closeModalWindow();
     }, 4000);
   }
+
+  fetch('http://localhost:3000/menu')
+    .then(res => res.json())
+    .then(res => console.log(res));
 });
