@@ -1,21 +1,25 @@
-export function slider() {
-  const slider = document.querySelector('.offer__slider');
-  const sliderList = document.querySelectorAll('.offer__slide');
-  const currentSlide = document.querySelector('#current');
-  const sliderPrevBtn = document.querySelector('.offer__slider-prev');
-  const sliderNextBtn = document.querySelector('.offer__slider-next');
-  const totalSlides = document.querySelector('#total');
-  const slidesWrapper = document.querySelector('.offer__slider-wrapper');
-  const slideField = document.querySelector('.offer__slider-inner');
+import { getZero } from '../helpers/getZero';
+export function slider({
+  container,
+  slides,
+  nextArrow,
+  prewArrow,
+  totalCounter,
+  currentCounter,
+  wrapprer,
+  fild,
+}) {
+  const slider = document.querySelector(container);
+  const sliderList = document.querySelectorAll(slides);
+  const sliderNextBtn = document.querySelector(nextArrow);
+  const sliderPrevBtn = document.querySelector(prewArrow);
+  const currentSlide = document.querySelector(currentCounter);
+  const totalSlides = document.querySelector(totalCounter);
+  const slidesWrapper = document.querySelector(wrapprer);
+  const slideField = document.querySelector(fild);
   const widthSlide = window.getComputedStyle(slidesWrapper).width;
   let slideIndex = 1;
   let offset = 0;
-  function getZero(num) {
-    if (num >= 0 && num < 10) {
-      return `0${num}`;
-    }
-    return num;
-  }
 
   totalSlides.textContent = getZero(sliderList.length);
   slideField.style.width = 100 * sliderList.length + '%';
@@ -115,7 +119,4 @@ export function slider() {
       activeDot();
     })
   );
-  fetch('http://localhost:3000/menu')
-    .then(res => res.json())
-    .then(res => res);
 }

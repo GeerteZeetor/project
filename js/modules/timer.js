@@ -1,6 +1,5 @@
-export function timer() {
-  const deadline = '2023-05-09';
-
+import { getZero } from '../helpers/getZero';
+export function timer(id, deadline) {
   function getTimeRemaining(endTime) {
     const t = Date.parse(endTime) - new Date();
     const days = Math.floor(t / (1000 * 60 * 60 * 24));
@@ -15,13 +14,6 @@ export function timer() {
       minutes,
       seconds,
     };
-  }
-
-  function getZero(num) {
-    if (num >= 0 && num < 10) {
-      return `0${num}`;
-    }
-    return num;
   }
 
   function setClock(selector, endTime) {

@@ -1,5 +1,6 @@
 import { showModalWindow } from './modal';
 import { closeModalWindow } from './modal';
+import { postData } from '../services/services';
 
 export function forms() {
   const forms = document.querySelectorAll('form');
@@ -15,16 +16,6 @@ export function forms() {
     bindPostData(form);
   });
 
-  const postData = async (url, data) => {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: data,
-    });
-    return await res.json();
-  };
   function showThanksModal(message) {
     prevModalDialog.classList.add('hide');
     showModalWindow('.modal');

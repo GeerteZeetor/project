@@ -6,11 +6,20 @@ import { calc } from './modules/calc';
 import { forms } from './modules/forms';
 import { slider } from './modules/slider';
 document.addEventListener('DOMContentLoaded', () => {
-  timer();
+  timer('.timer', '2023-05-09');
   modal('.modal', '[data-modal]');
   tabs();
   cards();
   calc();
   forms();
-  slider();
+  slider({
+    container: '.offer__slider',
+    nextArrow: '.offer__slider-next',
+    prewArrow: '.offer__slider-prev',
+    slides: '.offer__slide',
+    totalCounter: '#total',
+    currentCounter: '#current',
+    fild: '.offer__slider-inner',
+    wrapprer: '.offer__slider-wrapper',
+  });
 });
