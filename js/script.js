@@ -2,9 +2,9 @@ import { timer } from './modules/timer';
 import { modal } from './modules/modal';
 import { tabs } from './modules/tabs';
 import { cards } from './modules/cards';
+import { slider } from './modules/slider';
 import { calc } from './modules/calc';
 import { forms } from './modules/forms';
-import { slider } from './modules/slider';
 document.addEventListener('DOMContentLoaded', () => {
   timer('.timer', '2023-05-09');
   modal('.modal', '[data-modal]');
